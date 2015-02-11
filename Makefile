@@ -240,6 +240,10 @@ rpm-api: mig-api
 	fpm -C tmp -n mig-api --license GPL --vendor mozilla --description "Mozilla InvestiGator API" \
 		-m "Mozilla OpSec" --url http://mig.mozilla.org --architecture $(FPMARCH) -v $(BUILDREV) -s dir -t rpm .
 
+worker-agent-verif:
+	$(MKDIR) -p $(BINDIR)
+	$(GO) build $(GOOPTS) -o $(BINDIR)/mig_agent_verif_worker_$(OS)$(ARCH) $(GOLDFLAGS) mig/worker/agent_verif
+
 doc:
 	make -C doc doc
 

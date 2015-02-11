@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"mig"
+	"mig/event"
 	"time"
 
 	"github.com/streadway/amqp"
@@ -87,6 +88,12 @@ func getHeartbeats(msg amqp.Delivery, ctx Context) (err error) {
 	if !ok {
 		desc := fmt.Sprintf("getHeartbeats(): Agent '%s' is not authorized", agt.QueueLoc)
 		ctx.Channels.Log <- mig.Log{Desc: desc}.Warning()
+		// send an event to notify workers of the failed agent auth
+		err = sendEvent(event.Q_Agt_Auth_Fail, msg.Body, ctx)
+		if err != nil {
+			panic(err)
+		}
+		// agent authorization failed so we drop this heartbeat and return
 		return
 	}
 
